@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jednoduchý Správce Financí</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6; /* bg-gray-100 */
+      }
+      /* Custom scrollbar for better aesthetics */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+      .summary-card {
+        transition: all 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+      <header class="mb-8 text-center md:text-left">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800">
+          Jednoduchý Správce Financí
+        </h1>
+        <p class="text-gray-500 mt-1">
+          Měsíční přehled vašich příjmů a výdajů.
+        </p>
+      </header>
+
+      <main class="space-y-8">
+        <!-- Ovládací panel -->
+        <section class="bg-white p-6 rounded-xl shadow-md">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                for="current-balance"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Počáteční zůstatek na účtu (Kč)</label
+              >
+              <input
+                type="number"
+                id="current-balance"
+                placeholder="Např. 25000"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              />
+            </div>
+            <div>
+              <label
+                for="month-select"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Zvolený měsíc</label
+              >
+              <select
+                id="month-select"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
+              ></select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Souhrnné statistiky -->
+        <section>
+          <h2 class="text-xl font-semibold text-gray-700 mb-4">
+            Měsíční souhrn
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+              class="bg-green-100 border-l-4 border-green-500 p-4 rounded-lg shadow-sm"
+            >
+              <h3 class="text-sm font-medium text-green-800">
+                Očekávaný zůstatek na konci měsíce
+              </h3>
+              <p
+                id="final-balance"
+                class="text-2xl font-bold text-green-900 mt-1"
+              >
+                0 Kč
+              </p>
+            </div>
+            <div
+              class="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm"
+            >
+              <h3 class="text-sm font-medium text-blue-800">
+                Součet očekávaných příjmů
+              </h3>
+              <p
+                id="expected-income"
+                class="text-2xl font-bold text-blue-900 mt-1"
+              >
+                0 Kč
+              </p>
+            </div>
+          </div>
+          <div
+            id="status-summary"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-4"
+          >
+            <!-- Status summary cards will be injected here -->
+          </div>
+        </section>
+
+        <!-- Seznam položek -->
+        <section class="bg-white p-6 rounded-xl shadow-md">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-700">Položky</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <div id="items-list" class="min-w-[800px]">
+              <!-- Header -->
+              <div
+                class="grid grid-cols-[50px_1fr_120px_100px_180px_50px] gap-4 font-semibold text-gray-600 border-b pb-2 mb-2 text-sm"
+              >
+                <div class="text-center">Ikona</div>
+                <div>Popisek</div>
+                <div class="text-right">Částka (Kč)</div>
+                <div class="text-center">Den</div>
+                <div>Stav</div>
+                <div class="text-center">Akce</div>
+              </div>
+              <!-- New Item Row -->
+              <div
+                id="new-item-row"
+                class="grid grid-cols-[50px_1fr_120px_100px_180px_50px] gap-4 items-center p-2 rounded-lg bg-gray-50 mb-2 border-b"
+              >
+                <div
+                  class="flex justify-center items-center h-full text-blue-500"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"
+                    ></path>
+                  </svg>
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    id="new-item-description"
+                    placeholder="Nový příjem nebo výdaj..."
+                    class="w-full bg-white px-2 py-1 rounded border border-gray-300 outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </div>
+                <div class="text-right">
+                  <input
+                    type="number"
+                    id="new-item-value"
+                    placeholder="0"
+                    class="w-full bg-white px-2 py-1 rounded border border-gray-300 outline-none text-right font-medium focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </div>
+                <div class="text-center">
+                  <input
+                    type="number"
+                    id="new-item-day"
+                    placeholder="--"
+                    min="1"
+                    max="31"
+                    class="w-16 bg-white px-2 py-1 rounded border border-gray-300 outline-none text-center focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </div>
+                <div>
+                  <select
+                    id="new-item-status"
+                    class="w-full bg-white px-2 py-1 rounded border border-gray-300 outline-none font-semibold appearance-none focus:ring-2 focus:ring-blue-500 transition"
+                  ></select>
+                </div>
+                <div class="text-center">
+                  <button
+                    id="add-new-item-btn"
+                    title="Přidat položku"
+                    class="p-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center justify-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      fill="currentColor"
+                      viewBox="0 0 256 256"
+                    >
+                      <path
+                        d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <!-- Items will be injected here -->
+            </div>
+            <div
+              id="no-items-message"
+              class="text-center py-12 text-gray-500 hidden"
+            >
+              <p class="text-lg">Zatím tu nic není.</p>
+              <p>Přidejte svou první položku a začněte plánovat!</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- KONFIGURACE A STAVY ---
+        const STATUSES = {
+          zaplaceno: {
+            name: "Zaplaceno",
+            color: "bg-green-100 text-green-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-green-600" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>`,
+          },
+          fakturovano: {
+            name: "Fakturováno",
+            color: "bg-blue-100 text-blue-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-blue-600" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,176H48V48H208V208ZM104,104a8,8,0,0,1-8-8V80a8,8,0,0,1,16,0v16A8,8,0,0,1,104,104Zm48,8a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm-48,40a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Zm0,32a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Z"></path></svg>`,
+          },
+          k_fakturaci: {
+            name: "K fakturaci",
+            color: "bg-gray-100 text-gray-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-gray-600" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>`,
+          },
+          dotaz: {
+            name: "Dotaz",
+            color: "bg-yellow-100 text-yellow-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-yellow-600" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-40a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0Zm8-72a12,12,0,0,1,12,12v24a8,8,0,0,1-16,0V124a4,4,0,0,0-4-4,8,8,0,0,1,0-16,12,12,0,0,1,12,12Z"></path></svg>`,
+          },
+          naceneno: {
+            name: "Naceněno",
+            color: "bg-cyan-100 text-cyan-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-cyan-600" viewBox="0 0 256 256"><path d="M213.51,37.51A12,12,0,0,0,204,32H52a12,12,0,0,0-9.51,4.49L3.7,112.92A12,12,0,0,0,12,128H41.3l-8.62,47.4a12,12,0,0,0,11.53,14.54L56,189.69l-9.84,24.6a12,12,0,0,0,10.63,15.65A12.23,12.23,0,0,0,64,229.81l14.33-35.83a12,12,0,0,0-7.3-15.17l-19.4-6.47,8.62-47.4H244a12,12,0,0,0,11.71-9.08L255.49,44.49A12,12,0,0,0,248,32H216.7l8.62-47.4a12,12,0,0,0-11.53-14.54L202,-30.21l9.84-24.6a12,12,0,0,0-10.63-15.65A12.23,12.23,0,0,0,192,-60.19l-14.33,35.83a12,12,0,0,0,7.3,15.17l19.4,6.47L195.78,44.49ZM124,180a12,12,0,1,1,12,12A12,12,0,0,1,124,180Z"></path></svg>`,
+          },
+          zpracovano: {
+            name: "Zpracováno",
+            color: "bg-indigo-100 text-indigo-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-indigo-600" viewBox="0 0 256 256"><path d="M232,96a8,8,0,0,1-8,8H195.42l-19-47.45A16,16,0,0,0,161.42,40H94.58a16,16,0,0,0-15,16.55L60.58,104H32a8,8,0,0,1,0-16H56.89l5.63-28.17a32.1,32.1,0,0,1,30-27.77h66.84a32.1,32.1,0,0,1,30,27.77L200,96h24A8,8,0,0,1,232,96Zm-40,80a8,8,0,0,0-8,8v16H72V184a8,8,0,0,0-16,0v16a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184A8,8,0,0,0,192,176ZM92,136a12,12,0,1,0-12-12A12,12,0,0,0,92,136Zm44,12a12,12,0,1,0,12,12A12,12,0,0,0,136,148Zm44-12a12,12,0,1,0-12-12A12,12,0,0,0,180,136Z"></path></svg>`,
+          },
+          rozpracovane: {
+            name: "Rozpracované",
+            color: "bg-purple-100 text-purple-800",
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-purple-600" viewBox="0 0 256 256"><path d="M222.61,155.2l-32-64A8,8,0,0,0,184,88H72a8,8,0,0,0-6.61,3.2l-32,64A8,8,0,0,0,40,168H216a8,8,0,0,0,6.61-12.8ZM82.26,152,104,112.8,125.74,152Zm101.35-86.4a8,8,0,0,1,8.8-1.6l24,16a8,8,0,0,1-8.8,14.4l-15.2-10.13L184,88h-5.46l8-16a8,8,0,0,1,14.07-7.2Z"></path></svg>`,
+          },
+        };
+
+        const CZECH_MONTHS = [
+          "Leden",
+          "Únor",
+          "Březen",
+          "Duben",
+          "Květen",
+          "Červen",
+          "Červenec",
+          "Srpen",
+          "Září",
+          "Říjen",
+          "Listopad",
+          "Prosinec",
+        ];
+        const LOCAL_STORAGE_KEY = "simpleFinanceApp";
+
+        let state = {
+          currentMonth: "",
+          data: {},
+        };
+
+        // --- ELEMENTY DOM ---
+        const balanceInput = document.getElementById("current-balance");
+        const monthSelect = document.getElementById("month-select");
+        const itemsList = document.getElementById("items-list");
+        const finalBalanceEl = document.getElementById("final-balance");
+        const expectedIncomeEl = document.getElementById("expected-income");
+        const statusSummaryEl = document.getElementById("status-summary");
+        const noItemsMessage = document.getElementById("no-items-message");
+
+        // New item row elements
+        const newItemDescription = document.getElementById(
+          "new-item-description"
+        );
+        const newItemValue = document.getElementById("new-item-value");
+        const newItemDay = document.getElementById("new-item-day");
+        const newItemStatus = document.getElementById("new-item-status");
+        const addNewItemBtn = document.getElementById("add-new-item-btn");
+
+        // --- FUNKCE ---
+
+        const formatCurrency = (amount) => {
+          return new Intl.NumberFormat("cs-CZ", {
+            style: "currency",
+            currency: "CZK",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }).format(amount);
+        };
+
+        const saveData = () => {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.data));
+        };
+
+        const loadData = () => {
+          const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+          return data ? JSON.parse(data) : {};
+        };
+
+        const populateNewItemStatus = () => {
+          newItemStatus.innerHTML = Object.keys(STATUSES)
+            .map(
+              (key) => `<option value="${key}">${STATUSES[key].name}</option>`
+            )
+            .join("");
+          newItemStatus.value = "k_fakturaci"; // Default value
+        };
+
+        const populateMonthSelector = () => {
+          monthSelect.innerHTML = "";
+          const now = new Date();
+          const existingMonths = Object.keys(state.data).sort();
+          const monthSet = new Set(existingMonths);
+
+          for (let i = 0; i < 12; i++) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthKey = `${date.getFullYear()}-${String(
+              date.getMonth() + 1
+            ).padStart(2, "0")}`;
+            monthSet.add(monthKey);
+          }
+
+          const nextMonthDate = new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            1
+          );
+          const nextMonthKey = `${nextMonthDate.getFullYear()}-${String(
+            nextMonthDate.getMonth() + 1
+          ).padStart(2, "0")}`;
+          monthSet.add(nextMonthKey);
+
+          const sortedMonths = Array.from(monthSet).sort().reverse();
+
+          sortedMonths.forEach((monthKey) => {
+            const [year, month] = monthKey.split("-");
+            const option = document.createElement("option");
+            option.value = monthKey;
+            option.textContent = `${CZECH_MONTHS[parseInt(month) - 1]} ${year}`;
+            monthSelect.appendChild(option);
+          });
+        };
+
+        const render = () => {
+          const monthData = state.data[state.currentMonth] || {
+            balance: "",
+            items: [],
+          };
+
+          balanceInput.value = monthData.balance;
+
+          itemsList
+            .querySelectorAll(".item-row")
+            .forEach((row) => row.remove());
+
+          if (monthData.items.length === 0) {
+            noItemsMessage.classList.remove("hidden");
+          } else {
+            noItemsMessage.classList.add("hidden");
+            monthData.items.forEach((item) => {
+              const itemRow = document.createElement("div");
+              itemRow.className = `item-row grid grid-cols-[50px_1fr_120px_100px_180px_50px] gap-4 items-center p-2 rounded-lg transition-colors ${
+                STATUSES[item.status].color
+              }`;
+              itemRow.dataset.id = item.id;
+
+              const statusSelectOptions = Object.keys(STATUSES)
+                .map(
+                  (key) =>
+                    `<option value="${key}" ${
+                      item.status === key ? "selected" : ""
+                    }>${STATUSES[key].name}</option>`
+                )
+                .join("");
+
+              itemRow.innerHTML = `
+                    <div class="flex justify-center items-center h-full">${
+                      STATUSES[item.status].icon
+                    }</div>
+                    <div><input type="text" data-field="description" value="${
+                      item.description
+                    }" class="w-full bg-transparent p-1 rounded border border-transparent focus:border-gray-400 focus:bg-white outline-none"></div>
+                    <div class="text-right"><input type="number" data-field="value" value="${
+                      item.value
+                    }" class="w-full bg-transparent p-1 rounded border border-transparent focus:border-gray-400 focus:bg-white outline-none text-right font-medium"></div>
+                    <div class="text-center"><input type="number" data-field="day" value="${
+                      item.day || ""
+                    }" placeholder="--" min="1" max="31" class="w-16 bg-transparent p-1 rounded border border-transparent focus:border-gray-400 focus:bg-white outline-none text-center"></div>
+                    <div><select data-field="status" class="w-full bg-transparent p-1 rounded border border-transparent focus:border-gray-400 focus:bg-white outline-none font-semibold appearance-none">${statusSelectOptions}</select></div>
+                    <div class="text-center"><button class="delete-item-btn p-1 text-gray-400 hover:text-red-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192Z"></path></svg>
+                    </button></div>
+                `;
+              itemsList.appendChild(itemRow);
+            });
+          }
+          calculateAndDisplaySummary();
+        };
+
+        const calculateAndDisplaySummary = () => {
+          const monthData = state.data[state.currentMonth] || {
+            balance: 0,
+            items: [],
+          };
+          const startBalance = parseFloat(monthData.balance) || 0;
+
+          let totalSum = 0;
+          let expectedIncome = 0;
+          const statusTotals = Object.keys(STATUSES).reduce((acc, key) => {
+            acc[key] = 0;
+            return acc;
+          }, {});
+
+          monthData.items.forEach((item) => {
+            const value = parseFloat(item.value) || 0;
+            totalSum += value;
+            if (value > 0 && item.status !== "zaplaceno") {
+              expectedIncome += value;
+            }
+            if (statusTotals.hasOwnProperty(item.status)) {
+              statusTotals[item.status] += value;
+            }
+          });
+
+          const finalBalance = startBalance + totalSum;
+          finalBalanceEl.textContent = formatCurrency(finalBalance);
+          expectedIncomeEl.textContent = formatCurrency(expectedIncome);
+
+          statusSummaryEl.innerHTML = "";
+          Object.keys(statusTotals).forEach((key) => {
+            if (statusTotals[key] !== 0) {
+              const card = document.createElement("div");
+              card.className = `summary-card p-3 rounded-lg shadow-sm ${STATUSES[key].color}`;
+              card.innerHTML = `
+                    <h4 class="text-xs font-medium">${STATUSES[key].name}</h4>
+                    <p class="text-lg font-bold mt-1">${formatCurrency(
+                      statusTotals[key]
+                    )}</p>
+                `;
+              statusSummaryEl.appendChild(card);
+            }
+          });
+        };
+
+        const handleMonthChange = () => {
+          state.currentMonth = monthSelect.value;
+          render();
+        };
+
+        const handleBalanceChange = (e) => {
+          if (!state.data[state.currentMonth]) {
+            state.data[state.currentMonth] = { balance: "", items: [] };
+          }
+          state.data[state.currentMonth].balance = e.target.value;
+          saveData();
+          calculateAndDisplaySummary();
+        };
+
+        const handleAddNewItem = () => {
+          const description = newItemDescription.value.trim();
+          if (!description) {
+            newItemDescription.focus();
+            return; // Don't add if description is empty
+          }
+
+          if (!state.data[state.currentMonth]) {
+            state.data[state.currentMonth] = {
+              balance: balanceInput.value,
+              items: [],
+            };
+          }
+
+          const newItem = {
+            id: Date.now(),
+            description: description,
+            value: parseFloat(newItemValue.value) || 0,
+            day: newItemDay.value || "",
+            status: newItemStatus.value,
+          };
+
+          state.data[state.currentMonth].items.unshift(newItem); // Add to the top
+
+          // Clear input fields for next entry
+          newItemDescription.value = "";
+          newItemValue.value = "";
+          newItemDay.value = "";
+          newItemStatus.value = "k_fakturaci";
+          newItemDescription.focus();
+
+          saveData();
+          render();
+        };
+
+        const handleItemUpdate = (e) => {
+          const row = e.target.closest(".item-row");
+          if (!row) return;
+
+          const id = parseInt(row.dataset.id);
+          const field = e.target.dataset.field;
+          const value = e.target.value;
+
+          const monthData = state.data[state.currentMonth];
+          const item = monthData.items.find((i) => i.id === id);
+
+          if (item) {
+            if (field === "value" || field === "day") {
+              item[field] = value
+                ? parseFloat(value)
+                : field === "day"
+                ? ""
+                : 0;
+            } else {
+              item[field] = value;
+            }
+            saveData();
+            // Re-render only if status changed to update color and icon, otherwise just calculate
+            if (field === "status") {
+              render();
+            } else {
+              calculateAndDisplaySummary();
+            }
+          }
+        };
+
+        const handleDeleteItem = (e) => {
+          const button = e.target.closest(".delete-item-btn");
+          if (!button) return;
+
+          const row = button.closest(".item-row");
+          const id = parseInt(row.dataset.id);
+
+          const monthData = state.data[state.currentMonth];
+          monthData.items = monthData.items.filter((i) => i.id !== id);
+          saveData();
+          render();
+        };
+
+        // --- INICIALIZACE ---
+
+        const init = () => {
+          state.data = loadData();
+          populateMonthSelector();
+          populateNewItemStatus();
+
+          const now = new Date();
+          const currentMonthKey = `${now.getFullYear()}-${String(
+            now.getMonth() + 1
+          ).padStart(2, "0")}`;
+
+          if (monthSelect.querySelector(`option[value="${currentMonthKey}"]`)) {
+            monthSelect.value = currentMonthKey;
+          } else if (monthSelect.options.length > 0) {
+            monthSelect.selectedIndex = 0;
+          }
+
+          state.currentMonth = monthSelect.value;
+
+          monthSelect.addEventListener("change", handleMonthChange);
+          balanceInput.addEventListener("change", handleBalanceChange);
+          addNewItemBtn.addEventListener("click", handleAddNewItem);
+          newItemDescription.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddNewItem();
+            }
+          });
+          itemsList.addEventListener("change", handleItemUpdate);
+          itemsList.addEventListener("click", handleDeleteItem);
+
+          render();
+        };
+
+        init();
+      });
+    </script>
+  </body>
+</html>
