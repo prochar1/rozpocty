@@ -226,40 +226,53 @@
       document.addEventListener("DOMContentLoaded", () => {
         // --- KONFIGURACE A STAVY ---
         const STATUSES = {
-          zaplaceno: {
-            name: "Zaplaceno",
-            color: "bg-green-100 text-green-800",
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-green-600" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>`,
-          },
-          fakturovano: {
-            name: "Fakturováno",
-            color: "bg-blue-100 text-blue-800",
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-blue-600" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,176H48V48H208V208ZM104,104a8,8,0,0,1-8-8V80a8,8,0,0,1,16,0v16A8,8,0,0,1,104,104Zm48,8a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm-48,40a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Zm0,32a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Z"></path></svg>`,
-          },
-          k_fakturaci: {
-            name: "K fakturaci",
+          zadne: {
+            name: "Žádný stav",
             color: "bg-gray-100 text-gray-800",
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-gray-600" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>`,
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-gray-400" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM84,116a12,12,0,1,0,12,12A12,12,0,0,0,84,116Zm88,0a12,12,0,1,0,12,12A12,12,0,0,0,172,116Z"></path></svg>`,
+            sortOrder: 0,
           },
           dotaz: {
             name: "Dotaz",
-            color: "bg-yellow-100 text-yellow-800",
+            color: "bg-yellow-100 text-yellow-800", // Světle žlutá
             icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-yellow-600" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-40a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0Zm8-72a12,12,0,0,1,12,12v24a8,8,0,0,1-16,0V124a4,4,0,0,0-4-4,8,8,0,0,1,0-16,12,12,0,0,1,12,12Z"></path></svg>`,
-          },
-          naceneno: {
-            name: "Naceněno",
-            color: "bg-cyan-100 text-cyan-800",
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-cyan-600" viewBox="0 0 256 256"><path d="M213.51,37.51A12,12,0,0,0,204,32H52a12,12,0,0,0-9.51,4.49L3.7,112.92A12,12,0,0,0,12,128H41.3l-8.62,47.4a12,12,0,0,0,11.53,14.54L56,189.69l-9.84,24.6a12,12,0,0,0,10.63,15.65A12.23,12.23,0,0,0,64,229.81l14.33-35.83a12,12,0,0,0-7.3-15.17l-19.4-6.47,8.62-47.4H244a12,12,0,0,0,11.71-9.08L255.49,44.49A12,12,0,0,0,248,32H216.7l8.62-47.4a12,12,0,0,0-11.53-14.54L202,-30.21l9.84-24.6a12,12,0,0,0-10.63-15.65A12.23,12.23,0,0,0,192,-60.19l-14.33,35.83a12,12,0,0,0,7.3,15.17l19.4,6.47L195.78,44.49ZM124,180a12,12,0,1,1,12,12A12,12,0,0,1,124,180Z"></path></svg>`,
-          },
-          zpracovano: {
-            name: "Zpracováno",
-            color: "bg-indigo-100 text-indigo-800",
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-indigo-600" viewBox="0 0 256 256"><path d="M232,96a8,8,0,0,1-8,8H195.42l-19-47.45A16,16,0,0,0,161.42,40H94.58a16,16,0,0,0-15,16.55L60.58,104H32a8,8,0,0,1,0-16H56.89l5.63-28.17a32.1,32.1,0,0,1,30-27.77h66.84a32.1,32.1,0,0,1,30,27.77L200,96h24A8,8,0,0,1,232,96Zm-40,80a8,8,0,0,0-8,8v16H72V184a8,8,0,0,0-16,0v16a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184A8,8,0,0,0,192,176ZM92,136a12,12,0,1,0-12-12A12,12,0,0,0,92,136Zm44,12a12,12,0,1,0,12,12A12,12,0,0,0,136,148Zm44-12a12,12,0,1,0-12-12A12,12,0,0,0,180,136Z"></path></svg>`,
+            sortOrder: 1,
           },
           rozpracovane: {
             name: "Rozpracované",
-            color: "bg-purple-100 text-purple-800",
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-purple-600" viewBox="0 0 256 256"><path d="M222.61,155.2l-32-64A8,8,0,0,0,184,88H72a8,8,0,0,0-6.61,3.2l-32,64A8,8,0,0,0,40,168H216a8,8,0,0,0,6.61-12.8ZM82.26,152,104,112.8,125.74,152Zm101.35-86.4a8,8,0,0,1,8.8-1.6l24,16a8,8,0,0,1-8.8,14.4l-15.2-10.13L184,88h-5.46l8-16a8,8,0,0,1,14.07-7.2Z"></path></svg>`,
+            color: "bg-yellow-200 text-yellow-900", // Zlatá/Tmavě žlutá
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-yellow-700" viewBox="0 0 256 256"><path d="M222.61,155.2l-32-64A8,8,0,0,0,184,88H72a8,8,0,0,0-6.61,3.2l-32,64A8,8,0,0,0,40,168H216a8,8,0,0,0,6.61-12.8ZM82.26,152,104,112.8,125.74,152Zm101.35-86.4a8,8,0,0,1,8.8-1.6l24,16a8,8,0,0,1-8.8,14.4l-15.2-10.13L184,88h-5.46l8-16a8,8,0,0,1,14.07-7.2Z"></path></svg>`,
+            sortOrder: 2,
+          },
+          naceneno: {
+            name: "Naceněno",
+            color: "bg-gray-200 text-gray-800", // Šedá
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-gray-600" viewBox="0 0 256 256"><path d="M213.51,37.51A12,12,0,0,0,204,32H52a12,12,0,0,0-9.51,4.49L3.7,112.92A12,12,0,0,0,12,128H41.3l-8.62,47.4a12,12,0,0,0,11.53,14.54L56,189.69l-9.84,24.6a12,12,0,0,0,10.63,15.65A12.23,12.23,0,0,0,64,229.81l14.33-35.83a12,12,0,0,0-7.3-15.17l-19.4-6.47,8.62-47.4H244a12,12,0,0,0,11.71-9.08L255.49,44.49A12,12,0,0,0,248,32H216.7l8.62-47.4a12,12,0,0,0-11.53-14.54L202,-30.21l9.84-24.6a12,12,0,0,0-10.63-15.65A12.23,12.23,0,0,0,192,-60.19l-14.33,35.83a12,12,0,0,0,7.3,15.17l19.4,6.47L195.78,44.49ZM124,180a12,12,0,1,1,12,12A12,12,0,0,1,124,180Z"></path></svg>`,
+            sortOrder: 3,
+          },
+          k_fakturaci: {
+            name: "K fakturaci",
+            color: "bg-orange-200 text-orange-900", // Oranžová
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-orange-700" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>`,
+            sortOrder: 4,
+          },
+          fakturovano: {
+            name: "Fakturováno",
+            color: "bg-emerald-100 text-emerald-800", // Zelená
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-emerald-600" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,176H48V48H208V208ZM104,104a8,8,0,0,1-8-8V80a8,8,0,0,1,16,0v16A8,8,0,0,1,104,104Zm48,8a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm-48,40a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Zm0,32a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Z"></path></svg>`,
+            sortOrder: 5,
+          },
+          zpracovano: {
+            name: "Zpracováno",
+            color: "bg-blue-100 text-blue-800", // Modrá
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-blue-600" viewBox="0 0 256 256"><path d="M232,96a8,8,0,0,1-8,8H195.42l-19-47.45A16,16,0,0,0,161.42,40H94.58a16,16,0,0,0-15,16.55L60.58,104H32a8,8,0,0,1,0-16H56.89l5.63-28.17a32.1,32.1,0,0,1,30-27.77h66.84a32.1,32.1,0,0,1,30,27.77L200,96h24A8,8,0,0,1,232,96Zm-40,80a8,8,0,0,0-8,8v16H72V184a8,8,0,0,0-16,0v16a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184A8,8,0,0,0,192,176ZM92,136a12,12,0,1,0-12-12A12,12,0,0,0,92,136Zm44,12a12,12,0,1,0,12,12A12,12,0,0,0,136,148Zm44-12a12,12,0,1,0-12-12A12,12,0,0,0,180,136Z"></path></svg>`,
+            sortOrder: 6,
+          },
+          zaplaceno: {
+            name: "Zaplaceno",
+            color: "bg-green-100 text-green-800", // Světle zelená
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-green-600" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>`,
+            sortOrder: 7,
           },
         };
 
@@ -319,16 +332,29 @@
 
         const loadData = () => {
           const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-          return data ? JSON.parse(data) : {};
+          if (!data || Object.keys(JSON.parse(data)).length === 0) {
+            const now = new Date();
+            const currentMonthKey = `${now.getFullYear()}-${String(
+              now.getMonth() + 1
+            ).padStart(2, "0")}`;
+            return {
+              [currentMonthKey]: {
+                balance: "",
+                items: [],
+              },
+            };
+          }
+          return JSON.parse(data);
         };
 
         const populateNewItemStatus = () => {
           newItemStatus.innerHTML = Object.keys(STATUSES)
+            .sort((a, b) => STATUSES[a].sortOrder - STATUSES[b].sortOrder)
             .map(
               (key) => `<option value="${key}">${STATUSES[key].name}</option>`
             )
             .join("");
-          newItemStatus.value = "k_fakturaci"; // Default value
+          newItemStatus.value = "zadne"; // Default value
         };
 
         const populateMonthSelector = () => {
@@ -366,6 +392,31 @@
           });
         };
 
+        const sortItems = (items) => {
+          return items.sort((a, b) => {
+            // 1. Items without a day come first
+            const aHasDay = a.day !== "" && a.day != null;
+            const bHasDay = b.day !== "" && b.day != null;
+
+            if (aHasDay && !bHasDay) return 1;
+            if (!aHasDay && bHasDay) return -1;
+
+            // 2. If days are the same (or both are null), sort by status
+            if (a.day === b.day) {
+              const statusAOrder = STATUSES[a.status]?.sortOrder ?? 99;
+              const statusBOrder = STATUSES[b.status]?.sortOrder ?? 99;
+              return statusAOrder - statusBOrder;
+            }
+
+            // 3. Sort by day ascending
+            if (aHasDay && bHasDay) {
+              return a.day - b.day;
+            }
+
+            return 0;
+          });
+        };
+
         const render = () => {
           const monthData = state.data[state.currentMonth] || {
             balance: "",
@@ -382,7 +433,8 @@
             noItemsMessage.classList.remove("hidden");
           } else {
             noItemsMessage.classList.add("hidden");
-            monthData.items.forEach((item) => {
+            const sortedItems = sortItems(monthData.items);
+            sortedItems.forEach((item) => {
               const itemRow = document.createElement("div");
               itemRow.className = `item-row grid grid-cols-[50px_1fr_120px_100px_180px_50px] gap-4 items-center p-2 rounded-lg transition-colors ${
                 STATUSES[item.status].color
@@ -429,7 +481,16 @@
           };
           const startBalance = parseFloat(monthData.balance) || 0;
 
-          let totalSum = 0;
+          // Zjistíme dnešní datum bez času pro přesné porovnání
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // Získáme rok a měsíc z aktuálního stavu
+          const [currentYear, currentMonth] = state.currentMonth
+            .split("-")
+            .map(Number);
+
+          let futureSum = 0; // Suma pouze pro položky s datem od dnešního dne
           let expectedIncome = 0;
           const statusTotals = Object.keys(STATUSES).reduce((acc, key) => {
             acc[key] = 0;
@@ -438,7 +499,20 @@
 
           monthData.items.forEach((item) => {
             const value = parseFloat(item.value) || 0;
-            totalSum += value;
+
+            // Do budoucího zůstatku počítáme jen položky, které MAJÍ den a nejsou v minulosti.
+            if (item.day) {
+              const itemDate = new Date(
+                currentYear,
+                currentMonth - 1,
+                item.day
+              );
+              if (itemDate >= today) {
+                futureSum += value;
+              }
+            }
+
+            // Ostatní statistiky (očekávaný příjem, součty stavů) počítáme ze všech položek měsíce
             if (value > 0 && item.status !== "zaplaceno") {
               expectedIncome += value;
             }
@@ -447,7 +521,7 @@
             }
           });
 
-          const finalBalance = startBalance + totalSum;
+          const finalBalance = startBalance + futureSum;
           finalBalanceEl.textContent = formatCurrency(finalBalance);
           expectedIncomeEl.textContent = formatCurrency(expectedIncome);
 
@@ -503,13 +577,13 @@
             status: newItemStatus.value,
           };
 
-          state.data[state.currentMonth].items.unshift(newItem); // Add to the top
+          state.data[state.currentMonth].items.push(newItem);
 
           // Clear input fields for next entry
           newItemDescription.value = "";
           newItemValue.value = "";
           newItemDay.value = "";
-          newItemStatus.value = "k_fakturaci";
+          newItemStatus.value = "zadne";
           newItemDescription.focus();
 
           saveData();
